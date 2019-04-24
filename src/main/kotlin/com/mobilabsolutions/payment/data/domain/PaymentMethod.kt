@@ -2,8 +2,16 @@ package com.mobilabsolutions.payment.data.domain
 
 import com.mobilabsolutions.payment.data.enum.PaymentMethodType
 import org.springframework.data.util.ProxyUtils
-import java.util.*
-import javax.persistence.*
+import java.util.Objects
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
+import javax.persistence.Enumerated
+import javax.persistence.EnumType
+import javax.persistence.ManyToOne
+import javax.persistence.JoinColumn
+import javax.persistence.ForeignKey
 
 /**
  * @author <a href="mailto:jovana@mobilabsolutions.com">Jovana Veskovic</a>
@@ -16,7 +24,7 @@ class PaymentMethod(
     var id: String?,
 
     @Column(name = "active")
-    var active: Boolean?,
+    var active: Boolean = true,
 
     @Column(name = "alias_id")
     var aliasId: String?,
@@ -51,6 +59,6 @@ class PaymentMethod(
         return this.id == other.id
     }
     override fun toString(): String {
-        return "PaymentMethod [id=$id, aliasId=$aliasId, alias=$alias, type=$type, user=$user]"
+        return "PaymentMethod [id=$id, active=$active, aliasId=$aliasId, alias=$alias, type=$type, user=$user]"
     }
 }

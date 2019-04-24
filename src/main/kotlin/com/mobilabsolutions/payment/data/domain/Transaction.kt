@@ -1,14 +1,18 @@
 package com.mobilabsolutions.payment.data.domain
 
+import com.mobilabsolutions.payment.data.enum.TransactionAction
+import com.mobilabsolutions.payment.data.enum.TransactionStatus
 import org.springframework.data.util.ProxyUtils
 import java.util.Objects
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.ForeignKey
 import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
 import javax.persistence.Table
+import javax.persistence.Enumerated
+import javax.persistence.EnumType
+import javax.persistence.ManyToOne
+import javax.persistence.JoinColumn
+import javax.persistence.ForeignKey
 
 /**
  * @author <a href="mailto:jovana@mobilabsolutions.com">Jovana Veskovic</a>
@@ -31,6 +35,14 @@ class Transaction(
 
     @Column(name = "transaction_id")
     var transactionId: String?,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "action")
+    var action: TransactionAction?,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    var status: TransactionStatus?,
 
     @ManyToOne
     @JoinColumn(name = "payment_method_id", nullable = false, foreignKey = ForeignKey(name = "fk_paymentmethod_transaction"))

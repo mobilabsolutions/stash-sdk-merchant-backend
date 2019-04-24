@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 class UserController(private val userService: UserService) {
     companion object {
-        const val BASE_URL = "merchant/user"
+        const val BASE_URL = "user"
     }
 
     @ApiOperation(value = "Create an User for payment operations")
@@ -30,5 +30,5 @@ class UserController(private val userService: UserService) {
     @RequestMapping(method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE])
     @ResponseStatus(HttpStatus.CREATED)
-    fun createAlias() = userService.createUser()
+    fun createUser() = userService.createUser()
 }
