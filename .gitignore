@@ -15,7 +15,7 @@ target/
 *.iws
 *.iml
 *.ipr
-payment-ws/src/main/resources/application-local.properties
+src/main/resources/application-local.properties
 
 ### NetBeans ###
 /nbproject/private/
