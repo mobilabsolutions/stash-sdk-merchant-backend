@@ -24,6 +24,7 @@ class PaymentSdkService(
         const val IDEMPOTENT_KEY_HEADER = "Idempotent-Key"
         const val SECRET_KEY_HEADER = "Secret-Key"
         const val PSP_TEST_MODE_HEADER = "PSP-Test-Mode"
+        const val ALIAS_ID_PARAM = "Alias-Id"
         const val IDEMPOTENT_KEY_LENGTH = 23
     }
 
@@ -38,8 +39,8 @@ class PaymentSdkService(
             HttpMethod.PUT,
             authorizationRequestModel,
             httpHeaders,
-            AuthorizationResponseModel::class.java,
-            null)
+            AuthorizationResponseModel::class.java
+        )
     }
 
     fun deleteAlias(aliasId: String): Unit? {
@@ -47,15 +48,28 @@ class PaymentSdkService(
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set(SECRET_KEY_HEADER, paymentSdkConfiguration.merchantSecretKey)
         httpHeaders.set(PSP_TEST_MODE_HEADER, paymentSdkConfiguration.testMode)
-        println(paymentSdkConfiguration.deleteAliasUrl)
-        return executeRestCall(
+        val uriVariables = HashMap<String, String>()
+        uriVariables[ALIAS_ID_PARAM] = aliasId
+        return executeRestCallWithUriParams(
             paymentSdkConfiguration.deleteAliasUrl,
             HttpMethod.DELETE,
             null,
             httpHeaders,
             Unit::class.java,
-            arrayOf<Any>(aliasId)
+            uriVariables
         )
+    }
+
+    private fun <T, R> executeRestCallWithUriParams(
+        url: String,
+        httpMethod: HttpMethod,
+        requestBody: T?,
+        httpHeaders: HttpHeaders,
+        responseClass: Class<R>,
+        uriVariables: MutableMap<String, String>
+    ): R? {
+        val httpEntity = HttpEntity(requestBody, httpHeaders)
+        return restTemplate.exchange(url, httpMethod, httpEntity, responseClass, uriVariables).body
     }
 
     private fun <T, R> executeRestCall(
@@ -63,10 +77,9 @@ class PaymentSdkService(
         httpMethod: HttpMethod,
         requestBody: T?,
         httpHeaders: HttpHeaders,
-        responseClass: Class<R>,
-        uriVariables: Array<Any>?
+        responseClass: Class<R>
     ): R? {
         val httpEntity = HttpEntity(requestBody, httpHeaders)
-        return restTemplate.exchange(url, httpMethod, httpEntity, responseClass, uriVariables).body
+        return restTemplate.exchange(url, httpMethod, httpEntity, responseClass).body
     }
 }
