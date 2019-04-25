@@ -8,6 +8,6 @@ import io.swagger.annotations.ApiModelProperty
  */
 @ApiModel(value = "Create User Response")
 data class CreateUserResponseModel(
-    @ApiModelProperty(value = "User ID")
+    @ApiModelProperty(value = "User ID", example = "VIEMRvtMdLaloP4e")
     val userId: String?
 )

@@ -5,7 +5,7 @@ import com.mobilabsolutions.payment.data.domain.Transaction
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
 import com.mobilabsolutions.payment.data.repository.TransactionRepository
 import com.mobilabsolutions.payment.model.request.PaymentRequestModel
-import com.mobilabsolutions.payment.model.response.PaymentRespomseModel
+import com.mobilabsolutions.payment.model.response.PaymentResponseModel
 import com.mobilabsolutions.payment.paymentsdk.PaymentSdkService
 import com.mobilabsolutions.payment.paymentsdk.model.PaymentDataModel
 import com.mobilabsolutions.payment.paymentsdk.model.request.AuthorizationRequestModel
@@ -35,7 +35,7 @@ class TransactionService(
      * @param request payment request
      * @return payment response
      */
-    fun authorize(request: PaymentRequestModel): PaymentRespomseModel {
+    fun authorize(request: PaymentRequestModel): PaymentResponseModel {
         logger.info { "Executing transaction authorization" }
         val paymentMethod = paymentMethodRepository.getFirstById(request.paymentMethodId!!)
             ?: throw ApiError.ofMessage("Payment method cannot be found").asBadRequest()
@@ -64,7 +64,7 @@ class TransactionService(
             paymentMethod = paymentMethod
         )
         transactionRepository.save(transaction)
-        return PaymentRespomseModel(
+        return PaymentResponseModel(
             transactionId, transaction.status,
             transaction.amount, transaction.currency,
             authorizationResponse?.additionalInfo)

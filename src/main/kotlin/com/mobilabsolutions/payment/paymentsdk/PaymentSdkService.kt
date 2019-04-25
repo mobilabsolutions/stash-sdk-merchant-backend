@@ -3,11 +3,16 @@ package com.mobilabsolutions.payment.paymentsdk
 import com.mobilabsolutions.payment.common.util.RandomStringGenerator
 import com.mobilabsolutions.payment.paymentsdk.model.request.AuthorizationRequestModel
 import com.mobilabsolutions.payment.paymentsdk.model.response.AuthorizationResponseModel
+import com.mobilabsolutions.server.commons.exception.ApiError
+import com.mobilabsolutions.server.commons.exception.ApiException
+import mu.KLogging
+import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
 
 /**
@@ -20,7 +25,7 @@ class PaymentSdkService(
     private val randomStringGenerator: RandomStringGenerator
 ) {
 
-    companion object {
+    companion object : KLogging() {
         const val IDEMPOTENT_KEY_HEADER = "Idempotent-Key"
         const val SECRET_KEY_HEADER = "Secret-Key"
         const val PSP_TEST_MODE_HEADER = "PSP-Test-Mode"
@@ -69,7 +74,12 @@ class PaymentSdkService(
         uriVariables: MutableMap<String, String>
     ): R? {
         val httpEntity = HttpEntity(requestBody, httpHeaders)
-        return restTemplate.exchange(url, httpMethod, httpEntity, responseClass, uriVariables).body
+        try {
+            return restTemplate.exchange(url, httpMethod, httpEntity, responseClass, uriVariables).body
+        } catch (exception: RestClientResponseException) {
+            logger.error("Error during request to Payment SDK", exception)
+            throw handleResponseException(exception)
+        }
     }
 
     private fun <T, R> executeRestCall(
@@ -80,6 +90,21 @@ class PaymentSdkService(
         responseClass: Class<R>
     ): R? {
         val httpEntity = HttpEntity(requestBody, httpHeaders)
-        return restTemplate.exchange(url, httpMethod, httpEntity, responseClass).body
+        try {
+            return restTemplate.exchange(url, httpMethod, httpEntity, responseClass).body
+        } catch (exception: RestClientResponseException) {
+            logger.error("Error during request to Payment SDK", exception)
+            throw handleResponseException(exception)
+        }
+    }
+
+    private fun handleResponseException(exception: RestClientResponseException): ApiException {
+        val errorMessage = exception.responseBodyAsString
+        if (StringUtils.isEmpty(errorMessage)) {
+            throw ApiError.ofMessage("Payment SDK error message is empty").asInternalServerError()
+        }
+        throw ApiError.builder()
+            .withProperty("payment-sdk-error", exception.responseBodyAsString.removePrefix("{\"message\":\"").removeSuffix("\"}"))
+            .build().asInternalServerError()
     }
 }

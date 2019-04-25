@@ -1,8 +1,9 @@
-package com.mobilabsolutions.server.commons.exception
+package com.mobilabsolutions.payment.common.exception
 
+import com.mobilabsolutions.server.commons.exception.ApiError
+import com.mobilabsolutions.server.commons.exception.ApiException
 import mu.KLogging
 import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -11,7 +12,6 @@ import org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 import org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.validation.FieldError
 import org.springframework.web.HttpMediaTypeNotSupportedException
 import org.springframework.web.HttpRequestMethodNotSupportedException
@@ -38,12 +38,6 @@ import javax.validation.ConstraintViolationException
 class CommonExceptionHandler {
 
     companion object : KLogging()
-
-    @ResponseStatus(FORBIDDEN)
-    @ExceptionHandler(AccessDeniedException::class)
-    fun accessDeniedException(): ApiError {
-        return ApiError.ofMessage("Authenticated user doesn't have the required rights for this operation")
-    }
 
     @ResponseStatus(NOT_FOUND)
     @ExceptionHandler(NoHandlerFoundException::class)

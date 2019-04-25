@@ -31,7 +31,8 @@ class PaymentMethodController(private val paymentMethodService: PaymentMethodSer
 
     @ApiOperation(value = "Create a Payment method for payment operations")
     @ApiResponses(
-        ApiResponse(code = 201, message = "Successfully created a Payment method")
+        ApiResponse(code = 201, message = "Successfully created a Payment method"),
+        ApiResponse(code = 400, message = "Failed to create Payment method")
     )
     @RequestMapping(method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -43,7 +44,7 @@ class PaymentMethodController(private val paymentMethodService: PaymentMethodSer
     @ApiOperation(value = "Delete a Payment method")
     @ApiResponses(
         ApiResponse(code = 204, message = "Successfully deleted a Payment method"),
-        ApiResponse(code = 404, message = "Resource not found")
+        ApiResponse(code = 400, message = "Failed to delete Payment method")
     )
     @RequestMapping(DELETE_PAYMENT_METHOD_URL, method = [RequestMethod.DELETE])
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -53,7 +54,8 @@ class PaymentMethodController(private val paymentMethodService: PaymentMethodSer
 
     @ApiOperation(value = "Get Payment methods")
     @ApiResponses(
-        ApiResponse(code = 200, message = "Successfully returned Payment methods")
+        ApiResponse(code = 200, message = "Successfully returned Payment methods"),
+        ApiResponse(code = 400, message = "Failed to get Payment methods")
     )
     @RequestMapping(GET_PAYMENT_METHODS_URL, method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE])

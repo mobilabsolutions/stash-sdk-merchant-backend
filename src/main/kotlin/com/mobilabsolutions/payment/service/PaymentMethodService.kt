@@ -36,9 +36,9 @@ class PaymentMethodService(
      * @return create payment method response
      */
     fun createPaymentMethod(request: CreatePaymentMethodRequestModel): CreatePaymentMethodResponseModel {
+        logger.info("Creating payment method for user {}", request.userId)
         val user = userRepository.getFirstById(request.userId!!)
             ?: throw ApiError.ofMessage("User cannot be found").asBadRequest()
-        logger.info("Creating payment method for user: {}", user)
 
         val paymentMethodId = randomStringGenerator.generateRandomAlphanumeric(PAYMENT_METHOD_ID_LENGTH)
         val paymentMethod = PaymentMethod(
@@ -61,6 +61,7 @@ class PaymentMethodService(
         logger.info("Deleting payment method {}", paymentMethodId)
         val paymentMethod = paymentMethodRepository.getFirstById(paymentMethodId)
             ?: throw ApiError.ofMessage("Payment method cannot be found").asBadRequest()
+
         paymentSdkService.deleteAlias(paymentMethod.aliasId!!)
         paymentMethod.active = false
         paymentMethodRepository.save(paymentMethod)
@@ -74,6 +75,9 @@ class PaymentMethodService(
      */
     fun findAllPaymentMethodsForUser(userId: String): PaymentMethodListResponseModel {
         logger.info("Getting all payment methods for user {}", userId)
+        userRepository.getFirstById(userId)
+            ?: throw ApiError.ofMessage("User cannot be found").asBadRequest()
+
         val usersPaymentMethods = paymentMethodRepository.findAllByUserIdAndActive(userId, true)
         val paymentMethods = ArrayList<PaymentMethodResponseModel>()
         usersPaymentMethods.forEach { paymentMethods.add(PaymentMethodResponseModel(
