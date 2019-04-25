@@ -104,7 +104,7 @@ class PaymentSdkService(
             throw ApiError.ofMessage("Payment SDK error message is empty").asInternalServerError()
         }
         throw ApiError.builder()
-            .withProperty("payment-sdk-error", exception.responseBodyAsString.removePrefix("{\"message\":\"").removeSuffix("\"}"))
+            .withProperty("payment-sdk-error", errorMessage.removePrefix("{\"message\":\"").removeSuffix("\"}"))
             .build().asInternalServerError()
     }
 }
