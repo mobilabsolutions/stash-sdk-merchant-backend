@@ -1,5 +1,6 @@
 package com.mobilabsolutions.payment.service
 
+import com.mobilabsolutions.payment.common.exception.MerchantError
 import com.mobilabsolutions.payment.common.util.RandomStringGenerator
 import com.mobilabsolutions.payment.data.domain.PaymentMethod
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
@@ -8,7 +9,7 @@ import com.mobilabsolutions.payment.model.request.CreatePaymentMethodRequestMode
 import com.mobilabsolutions.payment.model.response.CreatePaymentMethodResponseModel
 import com.mobilabsolutions.payment.model.response.PaymentMethodListResponseModel
 import com.mobilabsolutions.payment.model.response.PaymentMethodResponseModel
-import com.mobilabsolutions.payment.paymentsdk.PaymentSdkService
+import com.mobilabsolutions.payment.paymentsdk.service.PaymentSdkService
 import com.mobilabsolutions.server.commons.exception.ApiError
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -38,7 +39,7 @@ class PaymentMethodService(
     fun createPaymentMethod(request: CreatePaymentMethodRequestModel): CreatePaymentMethodResponseModel {
         logger.info("Creating payment method for user {}", request.userId)
         val user = userRepository.getFirstById(request.userId!!)
-            ?: throw ApiError.ofMessage("User cannot be found").asBadRequest()
+            ?: throw ApiError.ofErrorCode(MerchantError.USER_NOT_FOUND).asException()
 
         val paymentMethodId = randomStringGenerator.generateRandomAlphanumeric(PAYMENT_METHOD_ID_LENGTH)
         val paymentMethod = PaymentMethod(
@@ -60,7 +61,7 @@ class PaymentMethodService(
     fun deletePaymentMethod(paymentMethodId: String) {
         logger.info("Deleting payment method {}", paymentMethodId)
         val paymentMethod = paymentMethodRepository.getFirstById(paymentMethodId)
-            ?: throw ApiError.ofMessage("Payment method cannot be found").asBadRequest()
+            ?: throw ApiError.ofErrorCode(MerchantError.PAYMENT_METHOD_NOT_FOUND).asException()
 
         paymentSdkService.deleteAlias(paymentMethod.aliasId!!)
         paymentMethod.active = false
@@ -76,7 +77,7 @@ class PaymentMethodService(
     fun findAllPaymentMethodsForUser(userId: String): PaymentMethodListResponseModel {
         logger.info("Getting all payment methods for user {}", userId)
         userRepository.getFirstById(userId)
-            ?: throw ApiError.ofMessage("User cannot be found").asBadRequest()
+            ?: throw ApiError.ofErrorCode(MerchantError.USER_NOT_FOUND).asException()
 
         val usersPaymentMethods = paymentMethodRepository.findAllByUserIdAndActive(userId, true)
         val paymentMethods = ArrayList<PaymentMethodResponseModel>()

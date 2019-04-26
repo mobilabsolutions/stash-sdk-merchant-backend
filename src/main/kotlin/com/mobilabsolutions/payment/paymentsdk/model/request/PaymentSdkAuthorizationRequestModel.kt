@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull
  * @author <a href="mailto:jovana@mobilabsolutions.com">Jovana Veskovic</a>
  */
 @ApiModel(value = "Authorization Request")
-data class AuthorizationRequestModel(
+data class PaymentSdkAuthorizationRequestModel(
     @ApiModelProperty("Alias ID", example = "JipfjLKL6BkTIREaRGyX")
     @field:NotNull
     val aliasId: String?,

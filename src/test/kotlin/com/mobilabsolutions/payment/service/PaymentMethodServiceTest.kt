@@ -7,7 +7,7 @@ import com.mobilabsolutions.payment.data.enum.PaymentMethodType
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
 import com.mobilabsolutions.payment.data.repository.UserRepository
 import com.mobilabsolutions.payment.model.request.CreatePaymentMethodRequestModel
-import com.mobilabsolutions.payment.paymentsdk.PaymentSdkService
+import com.mobilabsolutions.payment.paymentsdk.service.PaymentSdkService
 import com.mobilabsolutions.server.commons.exception.ApiException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll

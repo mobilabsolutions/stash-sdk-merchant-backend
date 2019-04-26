@@ -1,8 +1,11 @@
-package com.mobilabsolutions.payment.paymentsdk
+package com.mobilabsolutions.payment.paymentsdk.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.mobilabsolutions.payment.common.exception.MerchantError
 import com.mobilabsolutions.payment.common.util.RandomStringGenerator
-import com.mobilabsolutions.payment.paymentsdk.model.request.AuthorizationRequestModel
-import com.mobilabsolutions.payment.paymentsdk.model.response.AuthorizationResponseModel
+import com.mobilabsolutions.payment.paymentsdk.model.request.PaymentSdkAuthorizationRequestModel
+import com.mobilabsolutions.payment.paymentsdk.model.response.PaymentSdkAuthorizationResponseModel
+import com.mobilabsolutions.payment.paymentsdk.model.response.PaymentSdkErrorResponseModel
 import com.mobilabsolutions.server.commons.exception.ApiError
 import com.mobilabsolutions.server.commons.exception.ApiException
 import mu.KLogging
@@ -22,7 +25,8 @@ import org.springframework.web.client.RestTemplate
 class PaymentSdkService(
     private val restTemplate: RestTemplate,
     private val paymentSdkConfiguration: PaymentSdkConfiguration,
-    private val randomStringGenerator: RandomStringGenerator
+    private val randomStringGenerator: RandomStringGenerator,
+    private val jsonMapper: ObjectMapper
 ) {
 
     companion object : KLogging() {
@@ -33,7 +37,7 @@ class PaymentSdkService(
         const val IDEMPOTENT_KEY_LENGTH = 23
     }
 
-    fun authorization(authorizationRequestModel: AuthorizationRequestModel): AuthorizationResponseModel? {
+    fun authorization(authorizationRequestModel: PaymentSdkAuthorizationRequestModel): PaymentSdkAuthorizationResponseModel? {
         val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set(SECRET_KEY_HEADER, paymentSdkConfiguration.merchantSecretKey)
@@ -44,7 +48,7 @@ class PaymentSdkService(
             HttpMethod.PUT,
             authorizationRequestModel,
             httpHeaders,
-            AuthorizationResponseModel::class.java
+            PaymentSdkAuthorizationResponseModel::class.java
         )
     }
 
@@ -101,10 +105,15 @@ class PaymentSdkService(
     private fun handleResponseException(exception: RestClientResponseException): ApiException {
         val errorMessage = exception.responseBodyAsString
         if (StringUtils.isEmpty(errorMessage)) {
-            throw ApiError.ofMessage("Payment SDK error message is empty").asInternalServerError()
+            throw ApiError.ofErrorCode(MerchantError.PAYMENT_SDK_ERROR, "Payment SDK error message is empty").asException()
         }
-        throw ApiError.builder()
-            .withProperty("payment-sdk-error", errorMessage.removePrefix("{\"message\":\"").removeSuffix("\"}"))
-            .build().asInternalServerError()
+        val paymentSdkError = jsonMapper.readValue(errorMessage, PaymentSdkErrorResponseModel::class.java)
+        logger.error("Error during request to PaymentSDK. Error code: {}, error message: {}",
+            paymentSdkError.errorCode, paymentSdkError.errorDescription)
+        return ApiError.builder()
+            .withErrorCode(MerchantError.PAYMENT_SDK_ERROR)
+            .withError(MerchantError.PAYMENT_SDK_ERROR.message)
+            .withMessage(paymentSdkError.errorDescription!!)
+            .build().asException(MerchantError.PAYMENT_SDK_ERROR)
     }
 }

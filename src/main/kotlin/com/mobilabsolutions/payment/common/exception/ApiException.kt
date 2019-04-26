@@ -12,6 +12,12 @@ class ApiException : RuntimeException {
         const val STATUS_NON_ERROR_HTTP_STATUS_CODE = "status: non-error http status code"
     }
 
+    constructor(apiError: ApiError) : super(apiError.message().orElse(null)) {
+        this.status = apiError.httpStatus()
+        this.apiError = apiError
+        checkArgument(isErrorStatus(status), STATUS_NON_ERROR_HTTP_STATUS_CODE)
+    }
+
     constructor(status: HttpStatus, apiError: ApiError) : super(apiError.message().orElse(null)) {
         this.status = status
         this.apiError = apiError

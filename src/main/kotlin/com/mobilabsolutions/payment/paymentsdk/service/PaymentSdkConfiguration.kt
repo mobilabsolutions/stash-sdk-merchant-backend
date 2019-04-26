@@ -1,4 +1,4 @@
-package com.mobilabsolutions.payment.paymentsdk
+package com.mobilabsolutions.payment.paymentsdk.service
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration

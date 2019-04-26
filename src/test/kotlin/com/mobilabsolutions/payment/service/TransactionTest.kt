@@ -9,10 +9,10 @@ import com.mobilabsolutions.payment.data.enum.TransactionStatus
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
 import com.mobilabsolutions.payment.data.repository.TransactionRepository
 import com.mobilabsolutions.payment.model.request.PaymentRequestModel
-import com.mobilabsolutions.payment.paymentsdk.PaymentSdkService
+import com.mobilabsolutions.payment.paymentsdk.service.PaymentSdkService
 import com.mobilabsolutions.payment.paymentsdk.model.PaymentDataModel
-import com.mobilabsolutions.payment.paymentsdk.model.request.AuthorizationRequestModel
-import com.mobilabsolutions.payment.paymentsdk.model.response.AuthorizationResponseModel
+import com.mobilabsolutions.payment.paymentsdk.model.request.PaymentSdkAuthorizationRequestModel
+import com.mobilabsolutions.payment.paymentsdk.model.response.PaymentSdkAuthorizationResponseModel
 import com.mobilabsolutions.server.commons.exception.ApiException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -71,10 +71,10 @@ class TransactionTest {
         Mockito.`when`(paymentMethodRepository.getFirstById(wrongPaymentMethodId)).thenReturn(null)
 
         Mockito.`when`(paymentSdkService.authorization(
-            AuthorizationRequestModel(aliasId, PaymentDataModel(amount, currency, reason), transactionId, userId)
+            PaymentSdkAuthorizationRequestModel(aliasId, PaymentDataModel(amount, currency, reason), transactionId, userId)
         )
         ).thenReturn(
-            AuthorizationResponseModel(paymentSdkTransactionId, amount, currency, TransactionStatus.SUCCESS, TransactionAction.AUTH, null)
+            PaymentSdkAuthorizationResponseModel(paymentSdkTransactionId, amount, currency, TransactionStatus.SUCCESS, TransactionAction.AUTH, null)
         )
     }
 

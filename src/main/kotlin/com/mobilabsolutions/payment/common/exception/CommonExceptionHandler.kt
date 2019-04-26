@@ -55,7 +55,7 @@ class CommonExceptionHandler {
         logger.error("Bad request", exception)
         return ApiError.builder()
             .withMessage("argument.validation.error")
-            .withProperty("errors", exception.message ?: "non readable message")
+            .withError(exception.message ?: "non readable message")
             .build()
     }
 
@@ -65,7 +65,7 @@ class CommonExceptionHandler {
         logger.error("Bad request", exception)
         return ApiError.builder()
             .withMessage("argument.validation.error")
-            .withProperty("errors", exception.message)
+            .withError(exception.message)
             .build()
     }
 
@@ -81,7 +81,7 @@ class CommonExceptionHandler {
             .collect(Collectors.joining(", "))
         return ApiError.builder()
             .withMessage("argument.validation.error")
-            .withProperty("errors", errorMessage)
+            .withError(errorMessage)
             .build()
     }
 
@@ -103,7 +103,7 @@ class CommonExceptionHandler {
         logger.error("Bad request", exception)
         return ApiError.builder()
             .withMessage("argument.validation.error")
-            .withProperty("errors", "non readable message")
+            .withError("non readable message")
             .build()
     }
 
@@ -179,7 +179,7 @@ class CommonExceptionHandler {
             status.is4xxClientError -> logger.error("Api error", apiException)
             status.is5xxServerError -> logger.error("Api error", apiException)
             else -> logger.warn(
-                "Api exception with non-error " + "http status code. Should never happen!", apiException
+                "Api exception with non-error http status code. Should never happen!", apiException
             )
         }
         return ResponseEntity(apiException.apiError(), status)
@@ -204,7 +204,7 @@ class CommonExceptionHandler {
         logger.error("Service unavailable.", exception)
         return ApiError.builder()
             .withMessage("service.unavailable")
-            .withProperty("errors", exception.message!!)
+            .withError(exception.message!!)
             .build()
     }
 }

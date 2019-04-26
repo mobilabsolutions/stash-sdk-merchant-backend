@@ -1,14 +1,15 @@
 package com.mobilabsolutions.payment.service
 
+import com.mobilabsolutions.payment.common.exception.MerchantError
 import com.mobilabsolutions.payment.common.util.RandomStringGenerator
 import com.mobilabsolutions.payment.data.domain.Transaction
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
 import com.mobilabsolutions.payment.data.repository.TransactionRepository
 import com.mobilabsolutions.payment.model.request.PaymentRequestModel
 import com.mobilabsolutions.payment.model.response.PaymentResponseModel
-import com.mobilabsolutions.payment.paymentsdk.PaymentSdkService
+import com.mobilabsolutions.payment.paymentsdk.service.PaymentSdkService
 import com.mobilabsolutions.payment.paymentsdk.model.PaymentDataModel
-import com.mobilabsolutions.payment.paymentsdk.model.request.AuthorizationRequestModel
+import com.mobilabsolutions.payment.paymentsdk.model.request.PaymentSdkAuthorizationRequestModel
 import com.mobilabsolutions.server.commons.exception.ApiError
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -38,10 +39,10 @@ class TransactionService(
     fun authorize(request: PaymentRequestModel): PaymentResponseModel {
         logger.info { "Executing transaction authorization" }
         val paymentMethod = paymentMethodRepository.getFirstById(request.paymentMethodId!!)
-            ?: throw ApiError.ofMessage("Payment method cannot be found").asBadRequest()
+            ?: throw ApiError.ofErrorCode(MerchantError.USER_NOT_FOUND).asException()
         val transactionId = randomStringGenerator.generateRandomAlphanumeric(TRANSACTION_ID_LENGTH)
 
-        val authorizationRequest = AuthorizationRequestModel(
+        val authorizationRequest = PaymentSdkAuthorizationRequestModel(
             aliasId = paymentMethod.aliasId,
             paymentData = PaymentDataModel(
                 amount = request.amount,
