@@ -58,8 +58,8 @@ class TransactionService(
             purchaseId = transactionId,
             customerId = paymentMethod.user.id
         )
-        val idempotentKeyHeader = idempotentKey ?:
-            randomStringGenerator.generateRandomAlphanumeric(IDEMPOTENT_KEY_LENGTH)
+        val idempotentKeyHeader = idempotentKey
+            ?: randomStringGenerator.generateRandomAlphanumeric(IDEMPOTENT_KEY_LENGTH)
         val authorizationResponse = paymentSdkService.authorization(idempotentKeyHeader, authorizationRequest)
 
         return executeIdempotentTransaction(idempotentKeyHeader, TransactionAction.AUTH,
