@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "7ae826f4-db3c-4aa4-aa72-41595c24ca1d",
+		"name": "Payment SDK Merchant BE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{merchantBeUrl}}/merchant/user",
+							"host": [
+								"{{merchantBeUrl}}"
+							],
+							"path": [
+								"merchant",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PaymentMethod",
+			"item": [
+				{
+					"name": "Create Payment Method",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"aliasId\": \"\",\n\t\"alias\": \"\",\n\t\"type\": \"\",\n\t\"userId\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{merchantBeUrl}}/merchant/payment-method",
+							"host": [
+								"{{merchantBeUrl}}"
+							],
+							"path": [
+								"merchant",
+								"payment-method"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Payment Method",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{merchantBeUrl}}/merchant/payment-method/{Payment-Method-Id}",
+							"host": [
+								"{{merchantBeUrl}}"
+							],
+							"path": [
+								"merchant",
+								"payment-method",
+								"{Payment-Method-Id}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment Methods",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{merchantBeUrl}}/merchant/payment-method/{User-Id}",
+							"host": [
+								"{{merchantBeUrl}}"
+							],
+							"path": [
+								"merchant",
+								"payment-method",
+								"{User-Id}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transaction",
+			"item": [
+				{
+					"name": "Authorization",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+                            {
+                                "key": "Idempotent-Key",
+                                "value": "",
+                                "type": "text"
+                            }
+                        ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"amount\": 300,\n\t\"currency\": \"EUR\",\n\t\"reason\": \"Book\",\n\t\"paymentMethodId\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{merchantBeUrl}}/merchant/authorization",
+							"host": [
+								"{{merchantBeUrl}}"
+							],
+							"path": [
+								"merchant",
+								"authorization"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
