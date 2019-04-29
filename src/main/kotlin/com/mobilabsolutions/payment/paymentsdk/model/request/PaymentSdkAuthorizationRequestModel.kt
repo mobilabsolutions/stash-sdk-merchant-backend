@@ -25,5 +25,4 @@ data class PaymentSdkAuthorizationRequestModel(
 
     @ApiModelProperty("Customer ID", example = "122")
     val customerId: String?
-
 )

@@ -141,8 +141,13 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
-							}
-						],
+							},
+                            {
+                                "key": "Idempotent-Key",
+                                "value": "",
+                                "type": "text"
+                            }
+                        ],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n\t\"amount\": 300,\n\t\"currency\": \"EUR\",\n\t\"reason\": \"Book\",\n\t\"paymentMethodId\": \"\"\n}"

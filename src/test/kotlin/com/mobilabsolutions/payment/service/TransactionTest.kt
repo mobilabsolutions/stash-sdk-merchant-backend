@@ -1,5 +1,7 @@
 package com.mobilabsolutions.payment.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.mobilabsolutions.payment.common.configuration.CommonConfiguration
 import com.mobilabsolutions.payment.common.util.RandomStringGenerator
 import com.mobilabsolutions.payment.data.domain.PaymentMethod
 import com.mobilabsolutions.payment.data.domain.User
@@ -21,8 +23,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
+import org.mockito.Spy
 import org.mockito.MockitoAnnotations
+import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
@@ -45,6 +48,7 @@ class TransactionTest {
     private val amount = 300
     private val currency = "EUR"
     private val reason = "Book"
+    private val idempotentKey = "idempotentKey123"
 
     @InjectMocks
     private lateinit var transactionService: TransactionService
@@ -61,6 +65,9 @@ class TransactionTest {
     @Mock
     private lateinit var randomStringGenerator: RandomStringGenerator
 
+    @Spy
+    val objectMapper: ObjectMapper = CommonConfiguration().jsonMapper()
+
     @BeforeAll
     fun beforeAll() {
         MockitoAnnotations.initMocks(this)
@@ -71,7 +78,7 @@ class TransactionTest {
         Mockito.`when`(paymentMethodRepository.getFirstById(wrongPaymentMethodId)).thenReturn(null)
 
         Mockito.`when`(paymentSdkService.authorization(
-            PaymentSdkAuthorizationRequestModel(aliasId, PaymentDataModel(amount, currency, reason), transactionId, userId)
+            idempotentKey, PaymentSdkAuthorizationRequestModel(aliasId, PaymentDataModel(amount, currency, reason), transactionId, userId)
         )
         ).thenReturn(
             PaymentSdkAuthorizationResponseModel(paymentSdkTransactionId, amount, currency, TransactionStatus.SUCCESS, TransactionAction.AUTH, null)
@@ -80,13 +87,13 @@ class TransactionTest {
 
     @Test
     fun `successful authorization`() {
-        transactionService.authorize(PaymentRequestModel(amount, currency, reason, paymentMethodId))
+        transactionService.authorize(idempotentKey, PaymentRequestModel(amount, currency, reason, paymentMethodId))
     }
 
     @Test
     fun `authorization with wrong payment method`() {
         Assertions.assertThrows(ApiException::class.java) {
-            transactionService.authorize(PaymentRequestModel(amount, currency, reason, wrongPaymentMethodId))
+            transactionService.authorize(idempotentKey, PaymentRequestModel(amount, currency, reason, wrongPaymentMethodId))
         }
     }
 }

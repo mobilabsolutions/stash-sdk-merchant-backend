@@ -8,12 +8,14 @@ import io.swagger.annotations.ApiResponses
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RequestBody
 import javax.validation.Valid
+import javax.validation.constraints.Size
 
 /**
  * @author <a href="mailto:jovana@mobilabsolutions.com">Jovana Veskovic</a>
@@ -39,6 +41,7 @@ class PaymentController(private val transactionService: TransactionService) {
     )
     @ResponseStatus(HttpStatus.CREATED)
     fun authorizeTransaction(
+        @Size(min = 10, max = 40) @RequestHeader(value = "Idempotent-Key", required = false) idempotentKey: String?,
         @Valid @RequestBody request: PaymentRequestModel
-    ) = transactionService.authorize(request)
+    ) = transactionService.authorize(idempotentKey, request)
 }

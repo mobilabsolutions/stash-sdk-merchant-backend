@@ -2,7 +2,6 @@ package com.mobilabsolutions.payment.paymentsdk.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.mobilabsolutions.payment.common.exception.MerchantError
-import com.mobilabsolutions.payment.common.util.RandomStringGenerator
 import com.mobilabsolutions.payment.paymentsdk.model.request.PaymentSdkAuthorizationRequestModel
 import com.mobilabsolutions.payment.paymentsdk.model.response.PaymentSdkAuthorizationResponseModel
 import com.mobilabsolutions.payment.paymentsdk.model.response.PaymentSdkErrorResponseModel
@@ -25,7 +24,6 @@ import org.springframework.web.client.RestTemplate
 class PaymentSdkService(
     private val restTemplate: RestTemplate,
     private val paymentSdkConfiguration: PaymentSdkConfiguration,
-    private val randomStringGenerator: RandomStringGenerator,
     private val jsonMapper: ObjectMapper
 ) {
 
@@ -34,14 +32,13 @@ class PaymentSdkService(
         const val SECRET_KEY_HEADER = "Secret-Key"
         const val PSP_TEST_MODE_HEADER = "PSP-Test-Mode"
         const val ALIAS_ID_PARAM = "Alias-Id"
-        const val IDEMPOTENT_KEY_LENGTH = 23
     }
 
-    fun authorization(authorizationRequestModel: PaymentSdkAuthorizationRequestModel): PaymentSdkAuthorizationResponseModel? {
+    fun authorization(idempotentKey: String?, authorizationRequestModel: PaymentSdkAuthorizationRequestModel): PaymentSdkAuthorizationResponseModel? {
         val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set(SECRET_KEY_HEADER, paymentSdkConfiguration.merchantSecretKey)
-        httpHeaders.set(IDEMPOTENT_KEY_HEADER, randomStringGenerator.generateRandomAlphanumeric(IDEMPOTENT_KEY_LENGTH))
+        httpHeaders.set(IDEMPOTENT_KEY_HEADER, idempotentKey)
         httpHeaders.set(PSP_TEST_MODE_HEADER, paymentSdkConfiguration.testMode)
         return executeRestCall(
             paymentSdkConfiguration.authorizationUrl,

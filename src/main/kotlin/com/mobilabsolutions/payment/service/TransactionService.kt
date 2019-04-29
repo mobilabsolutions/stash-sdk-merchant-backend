@@ -1,8 +1,11 @@
 package com.mobilabsolutions.payment.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.mobilabsolutions.payment.common.exception.MerchantError
 import com.mobilabsolutions.payment.common.util.RandomStringGenerator
+import com.mobilabsolutions.payment.data.domain.PaymentMethod
 import com.mobilabsolutions.payment.data.domain.Transaction
+import com.mobilabsolutions.payment.data.enum.TransactionAction
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
 import com.mobilabsolutions.payment.data.repository.TransactionRepository
 import com.mobilabsolutions.payment.model.request.PaymentRequestModel
@@ -10,6 +13,7 @@ import com.mobilabsolutions.payment.model.response.PaymentResponseModel
 import com.mobilabsolutions.payment.paymentsdk.service.PaymentSdkService
 import com.mobilabsolutions.payment.paymentsdk.model.PaymentDataModel
 import com.mobilabsolutions.payment.paymentsdk.model.request.PaymentSdkAuthorizationRequestModel
+import com.mobilabsolutions.payment.paymentsdk.model.response.PaymentSdkAuthorizationResponseModel
 import com.mobilabsolutions.server.commons.exception.ApiError
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -24,10 +28,12 @@ class TransactionService(
     private val transactionRepository: TransactionRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     private val paymentSdkService: PaymentSdkService,
-    private val randomStringGenerator: RandomStringGenerator
+    private val randomStringGenerator: RandomStringGenerator,
+    private val jsonMapper: ObjectMapper
 ) {
     companion object : KLogging() {
         const val TRANSACTION_ID_LENGTH = 16
+        const val IDEMPOTENT_KEY_LENGTH = 23
     }
 
     /**
@@ -36,10 +42,10 @@ class TransactionService(
      * @param request payment request
      * @return payment response
      */
-    fun authorize(request: PaymentRequestModel): PaymentResponseModel {
+    fun authorize(idempotentKey: String?, request: PaymentRequestModel): PaymentResponseModel {
         logger.info { "Executing transaction authorization" }
         val paymentMethod = paymentMethodRepository.getFirstById(request.paymentMethodId!!)
-            ?: throw ApiError.ofErrorCode(MerchantError.USER_NOT_FOUND).asException()
+            ?: throw ApiError.ofErrorCode(MerchantError.PAYMENT_METHOD_NOT_FOUND).asException()
         val transactionId = randomStringGenerator.generateRandomAlphanumeric(TRANSACTION_ID_LENGTH)
 
         val authorizationRequest = PaymentSdkAuthorizationRequestModel(
@@ -52,22 +58,52 @@ class TransactionService(
             purchaseId = transactionId,
             customerId = paymentMethod.user.id
         )
-        val authorizationResponse = paymentSdkService.authorization(authorizationRequest)
+        val idempotentKeyHeader = idempotentKey ?:
+            randomStringGenerator.generateRandomAlphanumeric(IDEMPOTENT_KEY_LENGTH)
+        val authorizationResponse = paymentSdkService.authorization(idempotentKeyHeader, authorizationRequest)
 
-        val transaction = Transaction(
-            id = transactionId,
-            amount = authorizationResponse?.amount,
-            currency = authorizationResponse?.currency,
-            reason = request.reason,
-            transactionId = authorizationResponse?.id,
-            action = authorizationResponse?.action,
-            status = authorizationResponse?.status,
-            paymentMethod = paymentMethod
-        )
-        transactionRepository.save(transaction)
-        return PaymentResponseModel(
-            transactionId, transaction.status,
-            transaction.amount, transaction.currency,
-            authorizationResponse?.additionalInfo)
+        return executeIdempotentTransaction(idempotentKeyHeader, TransactionAction.AUTH,
+            paymentMethod, transactionId, request, authorizationResponse)
+    }
+
+    private fun executeIdempotentTransaction(
+        idempotentKey: String,
+        action: TransactionAction,
+        paymentMethod: PaymentMethod,
+        transactionId: String,
+        request: PaymentRequestModel,
+        authorizationResponse: PaymentSdkAuthorizationResponseModel?
+    ): PaymentResponseModel {
+        val transaction = transactionRepository.getByIdempotentKeyAndActionAndPaymentMethod(idempotentKey, action, paymentMethod)
+
+        when {
+            transaction != null -> return PaymentResponseModel(
+                transaction.id,
+                transaction.status,
+                transaction.amount,
+                transaction.currency,
+                jsonMapper.readValue(transaction.paymentSdkResponse, PaymentSdkAuthorizationResponseModel::class.java)?.additionalInfo
+            )
+            else -> {
+
+                val newTransaction = Transaction(
+                    id = transactionId,
+                    amount = authorizationResponse?.amount,
+                    currency = authorizationResponse?.currency,
+                    reason = request.reason,
+                    transactionId = authorizationResponse?.id,
+                    idempotentKey = idempotentKey,
+                    action = authorizationResponse?.action,
+                    status = authorizationResponse?.status,
+                    paymentSdkResponse = jsonMapper.writeValueAsString(authorizationResponse),
+                    paymentMethod = paymentMethod
+                )
+                transactionRepository.save(newTransaction)
+                return PaymentResponseModel(
+                    transactionId, newTransaction.status,
+                    newTransaction.amount, newTransaction.currency,
+                    authorizationResponse?.additionalInfo)
+            }
+        }
     }
 }
