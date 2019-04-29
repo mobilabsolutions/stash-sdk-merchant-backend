@@ -18,7 +18,7 @@ INITIAL_IMAGE=${BASE_IMAGE}:commit-${TRAVIS_COMMIT}
 
 build() {
   echo "Building ${INITIAL_IMAGE}"
-  docker build -t ${INITIAL_IMAGE} ${TRAVIS_BUILD_DIR}/payment-ws
+  docker build -t ${INITIAL_IMAGE} ${TRAVIS_BUILD_DIR}
 }
 
 tag() {
