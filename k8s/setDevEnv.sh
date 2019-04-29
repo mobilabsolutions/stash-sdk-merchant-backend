@@ -19,7 +19,7 @@ export KUBE_CONFIGMAP_SPRING_PROFILE="dev"
 export KUBE_CONFIGMAP_SQL_JDBC_URL="jdbc:postgresql://localhost/payment-sdk-backend-dev"
 export KUBE_CONFIGMAP_AUTHORIZATION_URL="https://payment-dev.mblb.net/api/v1/authorization"
 export KUBE_CONFIGMAP_DELETE_ALIAS_URL="https://payment-dev.mblb.net/api/v1/alias/{Alias-Id}"
-export KUBE_CONFIGMAP_TEST_MODE="true"
+export KUBE_CONFIGMAP_TEST_MODE="\"true\""
 
 # service variables
 
