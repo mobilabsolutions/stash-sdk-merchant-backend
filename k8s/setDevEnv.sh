@@ -16,7 +16,7 @@ export KUBE_DEPLOYMENT_SQL_INSTANCE_NAME="payment-backend-dev"
 # configmap variables
 export KUBE_CONFIGMAP_JAVA_OPTS="-Xmx300m -XX:+ExitOnOutOfMemoryError"
 export KUBE_CONFIGMAP_SPRING_PROFILE="dev"
-export KUBE_CONFIGMAP_SQL_JDBC_URL="jdbc:postgresql://localhost/payment-sdk-backend-dev"
+export KUBE_CONFIGMAP_SQL_JDBC_URL="jdbc:postgresql://localhost/payment-sdk-merchant-backend-dev"
 export KUBE_CONFIGMAP_AUTHORIZATION_URL="https://payment-dev.mblb.net/api/v1/authorization"
 export KUBE_CONFIGMAP_DELETE_ALIAS_URL="https://payment-dev.mblb.net/api/v1/alias/{Alias-Id}"
 export KUBE_CONFIGMAP_TEST_MODE="\"true\""
