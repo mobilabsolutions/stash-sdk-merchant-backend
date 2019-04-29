@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-sdk-backend
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: payment-sdk-backend
+data:
+  # JAVA_OPTS is set to these flags in order to limit container resources since current Java image `openjdk:8u181-jdk` is not supporting our default `-XX:+UseContainerSupport` flag
+  JAVA_OPTS: ${KUBE_CONFIGMAP_JAVA_OPTS}
+  SPRING_PROFILES_ACTIVE: ${KUBE_CONFIGMAP_SPRING_PROFILE}
+  DB_URL: ${KUBE_CONFIGMAP_SQL_JDBC_URL}
+  AUTHORIZATION_URL: ${KUBE_CONFIGMAP_AUTHORIZATION_URL}
+  DELETE_ALIAS_URL: ${KUBE_CONFIGMAP_DELETE_ALIAS_URL}
+  TEST_MODE: ${KUBE_CONFIGMAP_TEST_MODE}

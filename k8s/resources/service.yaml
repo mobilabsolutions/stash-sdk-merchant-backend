@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-merchant-backend
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: payment-merchant-backend
+spec:
+  type: NodePort
+  ports:
+  - name: api
+    port: 80
+    targetPort: api
+  selector:
+    app: payment-merchant-backend

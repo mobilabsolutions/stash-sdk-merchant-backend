@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-merchant-backend
+  namespace: ${KUBE_NAMESPACE}
+spec:
+  replicas: ${KUBE_DEPLOYMENT_REPLICA_COUNT}
+  selector:
+    matchLabels:
+      app: payment-merchant-backend
+  template:
+    metadata:
+      labels:
+        app: payment-merchant-backend
+        date: "${KUBE_APPLY_DATE}"
+    spec:
+      volumes:
+      - name: cloudsql-instance-credentials
+        secret:
+          secretName: cloudsql-instance-credentials
+      containers:
+      - name: payment-merchant-backend
+        image: eu.gcr.io/payment-server-reloaded/payment-merchant-backend:${KUBE_DEPLOYMENT_IMAGE_TAG}
+        resources:
+          requests:
+            cpu: ${KUBE_DEPLOYMENT_CPU_REQUEST}
+            memory: ${KUBE_DEPLOYMENT_MEMORY_REQUEST}
+          limits:
+            cpu: ${KUBE_DEPLOYMENT_CPU_LIMIT}
+            memory: ${KUBE_DEPLOYMENT_MEMORY_LIMIT}
+        envFrom:
+        - configMapRef:
+            name: payment-merchant-backend
+        - secretRef:
+            name: payment-merchant-backend
+        ports:
+        - containerPort: 8080
+          name: api
+        readinessProbe:
+          httpGet:
+            path: "/merchant/actuator/health"
+            port: api
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 3
+          timeoutSeconds: 5
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.13
+        command: ["/cloud_sql_proxy",
+                  "-instances=payment-server-reloaded:europe-west3:${KUBE_DEPLOYMENT_SQL_INSTANCE_NAME}=tcp:5432",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        securityContext:
+          runAsUser: 2  # non-root user
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - name: cloudsql-instance-credentials
+          mountPath: /secrets/cloudsql
+          readOnly: true
