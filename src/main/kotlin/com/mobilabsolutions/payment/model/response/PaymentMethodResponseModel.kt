@@ -12,8 +12,17 @@ data class PaymentMethodResponseModel(
     @ApiModelProperty(value = "Payment method ID", example = "jsnxcbjkmdmckd")
     val paymentMethodId: String?,
 
-    @ApiModelProperty(value = "Payment method alias - card number or email for PayPal", example = "VISA-1111")
-    val alias: String?,
+    @ApiModelProperty(value = "Credit card expiry month", example = "01")
+    val ccExpiryMonth: String?,
+
+    @ApiModelProperty(value = "Credit card expiry year", example = "19")
+    val ccExpiryYear: String?,
+
+    @ApiModelProperty(value = "Card type", example = "VISA")
+    val cardType: String?,
+
+    @ApiModelProperty(value = "Card mask - last 4 digits", example = "1111")
+    val cardMask: String?,
 
     @ApiModelProperty(value = "Payment method type", example = "SEPA")
     val type: PaymentMethodType?

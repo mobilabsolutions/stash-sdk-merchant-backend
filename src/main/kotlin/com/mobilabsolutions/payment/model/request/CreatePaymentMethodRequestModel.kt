@@ -16,9 +16,19 @@ data class CreatePaymentMethodRequestModel(
     @field:NotNull
     val aliasId: String?,
 
-    @ApiModelProperty(value = "Payment method alias - card number, or email for PayPal", example = "VISA-1111")
+    @ApiModelProperty(value = "Credit card expiry month", example = "01")
+    val ccExpiryMonth: String?,
+
+    @ApiModelProperty(value = "Credit card expiry year", example = "19")
+    val ccExpiryYear: String?,
+
+    @ApiModelProperty(value = "Card type", example = "VISA")
     @field:NotNull
-    val alias: String,
+    val cardType: String?,
+
+    @ApiModelProperty(value = "Card mask - last 4 digits", example = "1111")
+    @field:NotNull
+    val cardMask: String?,
 
     @ApiModelProperty(value = "Payment method type", example = "SEPA")
     @field:Enumerated(EnumType.STRING)

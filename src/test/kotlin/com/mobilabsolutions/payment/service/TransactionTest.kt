@@ -43,7 +43,10 @@ class TransactionTest {
     private val paymentMethodId = "testpaymentmethod"
     private val wrongPaymentMethodId = "wrong payment method id"
     private val aliasId = "aliasId"
-    private val alias = "VISA-1111"
+    private val ccExpiryMonth = "12"
+    private val ccExpiryYear = "19"
+    private val cardType = "VISA"
+    private val cardMask = "1111"
     private val user = User(id = userId)
     private val amount = 300
     private val currency = "EUR"
@@ -73,7 +76,7 @@ class TransactionTest {
         MockitoAnnotations.initMocks(this)
 
         Mockito.`when`(paymentMethodRepository.getFirstById(paymentMethodId)).thenReturn(
-            PaymentMethod(paymentMethodId, true, aliasId, alias, PaymentMethodType.CC, user)
+            PaymentMethod(paymentMethodId, true, aliasId, ccExpiryMonth, ccExpiryYear, cardType, cardMask, PaymentMethodType.CC, user)
         )
         Mockito.`when`(paymentMethodRepository.getFirstById(wrongPaymentMethodId)).thenReturn(null)
 

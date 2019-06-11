@@ -29,8 +29,17 @@ class PaymentMethod(
     @Column(name = "alias_id")
     var aliasId: String?,
 
-    @Column(name = "alias")
-    var alias: String?,
+    @Column(name = "cc_expiry_month")
+    var ccExpiryMonth: String?,
+
+    @Column(name = "cc_expiry_year")
+    var ccExpiryYear: String?,
+
+    @Column(name = "card_type")
+    var cardType: String?,
+
+    @Column(name = "card_mask")
+    var cardMask: String?,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
@@ -59,6 +68,6 @@ class PaymentMethod(
         return this.id == other.id
     }
     override fun toString(): String {
-        return "PaymentMethod [id=$id, active=$active, aliasId=$aliasId, alias=$alias, type=$type, user=$user]"
+        return "PaymentMethod [id=$id, active=$active, aliasId=$aliasId, ccExpiryMonth=$ccExpiryMonth, ccExpiryYear=$ccExpiryYear, cardType=$cardType, cardMask=$cardMask, type=$type, user=$user]"
     }
 }

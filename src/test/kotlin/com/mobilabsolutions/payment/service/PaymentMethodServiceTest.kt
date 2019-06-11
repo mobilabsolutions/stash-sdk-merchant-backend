@@ -34,7 +34,10 @@ class PaymentMethodServiceTest {
     private val paymentMethodId = "testpaymentmethod"
     private val wrongPaymentMethodId = "wrong payment method id"
     private val aliasId = "aliasId"
-    private val alias = "VISA-1111"
+    private val ccExpiryMonth = "12"
+    private val ccExpiryYear = "19"
+    private val cardType = "VISA"
+    private val cardMask = "1111"
     private val user = User(id = userId)
 
     @InjectMocks
@@ -60,23 +63,23 @@ class PaymentMethodServiceTest {
         Mockito.`when`(userRepository.getFirstById(wrongUserId)).thenReturn(null)
         Mockito.`when`(randomStringGenerator.generateRandomAlphanumeric(16)).thenReturn(paymentMethodId)
         Mockito.`when`(paymentMethodRepository.getFirstById(paymentMethodId)).thenReturn(
-            PaymentMethod(paymentMethodId, true, aliasId, alias, PaymentMethodType.CC, user)
+            PaymentMethod(paymentMethodId, true, aliasId, ccExpiryMonth, ccExpiryYear, cardType, cardMask, PaymentMethodType.CC, user)
         )
         Mockito.`when`(paymentMethodRepository.getFirstById(wrongPaymentMethodId)).thenReturn(null)
         Mockito.`when`(paymentMethodRepository.findAllByUserIdAndActive(userId, true)).thenReturn(
-            listOf(PaymentMethod(paymentMethodId, true, aliasId, alias, PaymentMethodType.CC, user))
+            listOf(PaymentMethod(paymentMethodId, true, aliasId, ccExpiryMonth, ccExpiryYear, cardType, cardMask, PaymentMethodType.CC, user))
         )
     }
 
     @Test
     fun `create payment method for existing user`() {
-        paymentMethodService.createPaymentMethod(CreatePaymentMethodRequestModel(aliasId, alias, PaymentMethodType.CC, userId))
+        paymentMethodService.createPaymentMethod(CreatePaymentMethodRequestModel(aliasId, ccExpiryMonth, ccExpiryYear, cardType, cardMask, PaymentMethodType.CC, userId))
     }
 
     @Test
     fun `create payment method for non existing user`() {
         Assertions.assertThrows(ApiException::class.java) {
-            paymentMethodService.createPaymentMethod(CreatePaymentMethodRequestModel(aliasId, alias, PaymentMethodType.CC, wrongUserId))
+            paymentMethodService.createPaymentMethod(CreatePaymentMethodRequestModel(aliasId, ccExpiryMonth, ccExpiryYear, cardType, cardMask, PaymentMethodType.CC, wrongUserId))
         }
     }
 

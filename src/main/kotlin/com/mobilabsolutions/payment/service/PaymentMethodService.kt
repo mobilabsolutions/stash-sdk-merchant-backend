@@ -45,7 +45,10 @@ class PaymentMethodService(
         val paymentMethod = PaymentMethod(
             id = paymentMethodId,
             aliasId = request.aliasId,
-            alias = request.alias,
+            ccExpiryMonth = request.ccExpiryMonth,
+            ccExpiryYear = request.ccExpiryYear,
+            cardType = request.cardType,
+            cardMask = request.cardMask,
             type = request.type,
             user = user
         )
@@ -83,7 +86,10 @@ class PaymentMethodService(
         val paymentMethods = ArrayList<PaymentMethodResponseModel>()
         usersPaymentMethods.forEach { paymentMethods.add(PaymentMethodResponseModel(
             paymentMethodId = it.id,
-            alias = it.alias,
+            ccExpiryMonth = it.ccExpiryMonth,
+            ccExpiryYear = it.ccExpiryYear,
+            cardType = it.cardType,
+            cardMask = it.cardMask,
             type = it.type
         )) }
         return PaymentMethodListResponseModel(paymentMethods)
