@@ -54,7 +54,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"aliasId\": \"\",\n\t\"alias\": \"\",\n\t\"type\": \"\",\n\t\"userId\": \"\"\n}"
+							"raw": "{\n\t\"aliasId\": \"\",\n\t\"type\": \"\",\n\t\"userId\": \"\",\n\t\"ccData\": {\n\t\t\"ccExpiryMonth\": \"\",\n\t\t\"ccExpiryYear\": \"\",\n\t\t\"ccType\": \"\",\n\t\t\"ccMask\": \"\"\n    },\n    \"payPalData\": {\n\t\t\"email\": \"\"\n    },\n    \"sepaData\": {\n\t\t\"iban\": \"\"\n    }\n}"
 						},
 						"url": {
 							"raw": "{{merchantBeUrl}}/merchant/payment-method",
