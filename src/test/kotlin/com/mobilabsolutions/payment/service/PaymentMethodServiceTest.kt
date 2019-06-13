@@ -1,11 +1,16 @@
 package com.mobilabsolutions.payment.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.mobilabsolutions.payment.common.configuration.CommonConfiguration
 import com.mobilabsolutions.payment.common.util.RandomStringGenerator
 import com.mobilabsolutions.payment.data.domain.PaymentMethod
 import com.mobilabsolutions.payment.data.domain.User
 import com.mobilabsolutions.payment.data.enum.PaymentMethodType
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
 import com.mobilabsolutions.payment.data.repository.UserRepository
+import com.mobilabsolutions.payment.model.CreditCardDataModel
+import com.mobilabsolutions.payment.model.PayPalDataModel
+import com.mobilabsolutions.payment.model.SepaDataModel
 import com.mobilabsolutions.payment.model.request.CreatePaymentMethodRequestModel
 import com.mobilabsolutions.payment.paymentsdk.service.PaymentSdkService
 import com.mobilabsolutions.server.commons.exception.ApiException
@@ -18,6 +23,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
+import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
@@ -34,11 +40,13 @@ class PaymentMethodServiceTest {
     private val paymentMethodId = "testpaymentmethod"
     private val wrongPaymentMethodId = "wrong payment method id"
     private val aliasId = "aliasId"
-    private val ccExpiryMonth = "12"
-    private val ccExpiryYear = "19"
-    private val cardType = "VISA"
-    private val cardMask = "1111"
+    private val ccData = "{\"ccExpiryMonth\":\"10\",\"ccExpiryYear\":\"2019\",\"ccType\":\"VISA\",\"ccMask\":\"1111\"}"
+    private val paypalData = "{\"email\":\"some@email.com\"}"
+    private val sepaData = "{\"iban\":\"DE00123456782599100004\"}"
     private val user = User(id = userId)
+
+    @Spy
+    val objectMapper: ObjectMapper = CommonConfiguration().jsonMapper()
 
     @InjectMocks
     private lateinit var paymentMethodService: PaymentMethodService
@@ -63,23 +71,23 @@ class PaymentMethodServiceTest {
         Mockito.`when`(userRepository.getFirstById(wrongUserId)).thenReturn(null)
         Mockito.`when`(randomStringGenerator.generateRandomAlphanumeric(16)).thenReturn(paymentMethodId)
         Mockito.`when`(paymentMethodRepository.getFirstById(paymentMethodId)).thenReturn(
-            PaymentMethod(paymentMethodId, true, aliasId, ccExpiryMonth, ccExpiryYear, cardType, cardMask, PaymentMethodType.CC, user)
+            PaymentMethod(paymentMethodId, true, aliasId, ccData, paypalData, sepaData, PaymentMethodType.CC, user)
         )
         Mockito.`when`(paymentMethodRepository.getFirstById(wrongPaymentMethodId)).thenReturn(null)
         Mockito.`when`(paymentMethodRepository.findAllByUserIdAndActive(userId, true)).thenReturn(
-            listOf(PaymentMethod(paymentMethodId, true, aliasId, ccExpiryMonth, ccExpiryYear, cardType, cardMask, PaymentMethodType.CC, user))
+            listOf(PaymentMethod(paymentMethodId, true, aliasId, ccData, paypalData, sepaData, PaymentMethodType.CC, user))
         )
     }
 
     @Test
     fun `create payment method for existing user`() {
-        paymentMethodService.createPaymentMethod(CreatePaymentMethodRequestModel(aliasId, ccExpiryMonth, ccExpiryYear, cardType, cardMask, PaymentMethodType.CC, userId))
+        paymentMethodService.createPaymentMethod(CreatePaymentMethodRequestModel(aliasId, PaymentMethodType.CC, userId, objectMapper.readValue(ccData, CreditCardDataModel::class.java), objectMapper.readValue(paypalData, PayPalDataModel::class.java), objectMapper.readValue(sepaData, SepaDataModel::class.java)))
     }
 
     @Test
     fun `create payment method for non existing user`() {
         Assertions.assertThrows(ApiException::class.java) {
-            paymentMethodService.createPaymentMethod(CreatePaymentMethodRequestModel(aliasId, ccExpiryMonth, ccExpiryYear, cardType, cardMask, PaymentMethodType.CC, wrongUserId))
+            paymentMethodService.createPaymentMethod(CreatePaymentMethodRequestModel(aliasId, PaymentMethodType.CC, wrongUserId, objectMapper.readValue(ccData, CreditCardDataModel::class.java), objectMapper.readValue(paypalData, PayPalDataModel::class.java), objectMapper.readValue(sepaData, SepaDataModel::class.java)))
         }
     }
 

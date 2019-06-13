@@ -1,6 +1,7 @@
 package com.mobilabsolutions.payment.data.domain
 
 import com.mobilabsolutions.payment.data.enum.PaymentMethodType
+import org.hibernate.annotations.Type
 import org.springframework.data.util.ProxyUtils
 import java.util.Objects
 import javax.persistence.Column
@@ -29,17 +30,17 @@ class PaymentMethod(
     @Column(name = "alias_id")
     var aliasId: String?,
 
-    @Column(name = "cc_expiry_month")
-    var ccExpiryMonth: String?,
+    @Type(type = "org.hibernate.type.TextType")
+    @Column(name = "cc_data")
+    var ccData: String?,
 
-    @Column(name = "cc_expiry_year")
-    var ccExpiryYear: String?,
+    @Type(type = "org.hibernate.type.TextType")
+    @Column(name = "paypal_data")
+    var paypalData: String?,
 
-    @Column(name = "card_type")
-    var cardType: String?,
-
-    @Column(name = "card_mask")
-    var cardMask: String?,
+    @Type(type = "org.hibernate.type.TextType")
+    @Column(name = "sepa_data")
+    var sepaData: String?,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
@@ -68,6 +69,6 @@ class PaymentMethod(
         return this.id == other.id
     }
     override fun toString(): String {
-        return "PaymentMethod [id=$id, active=$active, aliasId=$aliasId, ccExpiryMonth=$ccExpiryMonth, ccExpiryYear=$ccExpiryYear, cardType=$cardType, cardMask=$cardMask, type=$type, user=$user]"
+        return "PaymentMethod [id=$id, active=$active, aliasId=$aliasId, ccData=$ccData, paypalData=$paypalData, sepaData=$sepaData, type=$type, user=$user]"
     }
 }

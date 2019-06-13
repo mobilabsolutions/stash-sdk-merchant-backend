@@ -1,6 +1,9 @@
 package com.mobilabsolutions.payment.model.request
 
 import com.mobilabsolutions.payment.data.enum.PaymentMethodType
+import com.mobilabsolutions.payment.model.CreditCardDataModel
+import com.mobilabsolutions.payment.model.PayPalDataModel
+import com.mobilabsolutions.payment.model.SepaDataModel
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import javax.persistence.EnumType
@@ -16,20 +19,6 @@ data class CreatePaymentMethodRequestModel(
     @field:NotNull
     val aliasId: String?,
 
-    @ApiModelProperty(value = "Credit card expiry month", example = "01")
-    val ccExpiryMonth: String?,
-
-    @ApiModelProperty(value = "Credit card expiry year", example = "19")
-    val ccExpiryYear: String?,
-
-    @ApiModelProperty(value = "Card type", example = "VISA")
-    @field:NotNull
-    val cardType: String?,
-
-    @ApiModelProperty(value = "Card mask - last 4 digits", example = "1111")
-    @field:NotNull
-    val cardMask: String?,
-
     @ApiModelProperty(value = "Payment method type", example = "SEPA")
     @field:Enumerated(EnumType.STRING)
     @field:NotNull
@@ -37,5 +26,14 @@ data class CreatePaymentMethodRequestModel(
 
     @ApiModelProperty(value = "User ID", example = "X0yaCDH84WmdDMWxaqGY")
     @field:NotNull
-    val userId: String?
+    val userId: String?,
+
+    @ApiModelProperty(value = "Credit card configuration")
+    val ccData: CreditCardDataModel,
+
+    @ApiModelProperty(value = "PayPal configuration")
+    val payPalData: PayPalDataModel,
+
+    @ApiModelProperty(value = "SEPA configuration")
+    val sepaData: SepaDataModel
 )
