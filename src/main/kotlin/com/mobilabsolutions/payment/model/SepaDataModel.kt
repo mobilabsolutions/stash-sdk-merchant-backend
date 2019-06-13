@@ -9,5 +9,5 @@ import io.swagger.annotations.ApiModelProperty
 @ApiModel(value = "SEPA Data Model")
 class SepaDataModel(
     @ApiModelProperty(value = "IBAN", example = "DE00123456782599100004")
-    val iban: String
+    val iban: String?
 )

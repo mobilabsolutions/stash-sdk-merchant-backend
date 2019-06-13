@@ -29,11 +29,11 @@ data class CreatePaymentMethodRequestModel(
     val userId: String?,
 
     @ApiModelProperty(value = "Credit card configuration")
-    val ccData: CreditCardDataModel,
+    val ccData: CreditCardDataModel?,
 
     @ApiModelProperty(value = "PayPal configuration")
-    val payPalData: PayPalDataModel,
+    val payPalData: PayPalDataModel?,
 
     @ApiModelProperty(value = "SEPA configuration")
-    val sepaData: SepaDataModel
+    val sepaData: SepaDataModel?
 )

@@ -9,5 +9,5 @@ import io.swagger.annotations.ApiModelProperty
 @ApiModel(value = "PayPal Data Model")
 data class PayPalDataModel(
     @ApiModelProperty(value = "Email", example = "abc@gmail.com")
-    val email: String
+    val email: String?
 )

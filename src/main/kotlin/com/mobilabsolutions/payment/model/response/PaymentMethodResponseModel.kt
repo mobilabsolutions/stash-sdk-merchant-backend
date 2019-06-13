@@ -19,11 +19,11 @@ data class PaymentMethodResponseModel(
     val type: PaymentMethodType?,
 
     @ApiModelProperty(value = "Credit card data")
-    val ccData: CreditCardDataModel,
+    val ccData: CreditCardDataModel?,
 
     @ApiModelProperty(value = "PayPal data")
-    val payPalData: PayPalDataModel,
+    val payPalData: PayPalDataModel?,
 
     @ApiModelProperty(value = "SEPA data")
-    val sepaData: SepaDataModel
+    val sepaData: SepaDataModel?
 )
