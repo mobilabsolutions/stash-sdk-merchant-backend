@@ -1,10 +1,14 @@
 package com.mobilabsolutions.payment.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.mobilabsolutions.payment.common.exception.MerchantError
 import com.mobilabsolutions.payment.common.util.RandomStringGenerator
 import com.mobilabsolutions.payment.data.domain.PaymentMethod
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
 import com.mobilabsolutions.payment.data.repository.UserRepository
+import com.mobilabsolutions.payment.model.CreditCardDataModel
+import com.mobilabsolutions.payment.model.PayPalDataModel
+import com.mobilabsolutions.payment.model.SepaDataModel
 import com.mobilabsolutions.payment.model.request.CreatePaymentMethodRequestModel
 import com.mobilabsolutions.payment.model.response.CreatePaymentMethodResponseModel
 import com.mobilabsolutions.payment.model.response.PaymentMethodListResponseModel
@@ -24,7 +28,8 @@ class PaymentMethodService(
     private val paymentMethodRepository: PaymentMethodRepository,
     private val userRepository: UserRepository,
     private val paymentSdkService: PaymentSdkService,
-    private val randomStringGenerator: RandomStringGenerator
+    private val randomStringGenerator: RandomStringGenerator,
+    private val objectMapper: ObjectMapper
 ) {
     companion object : KLogging() {
         const val PAYMENT_METHOD_ID_LENGTH = 16
@@ -45,7 +50,9 @@ class PaymentMethodService(
         val paymentMethod = PaymentMethod(
             id = paymentMethodId,
             aliasId = request.aliasId,
-            alias = request.alias,
+            ccData = objectMapper.writeValueAsString(request.ccData),
+            paypalData = objectMapper.writeValueAsString(request.payPalData),
+            sepaData = objectMapper.writeValueAsString(request.sepaData),
             type = request.type,
             user = user
         )
@@ -83,7 +90,9 @@ class PaymentMethodService(
         val paymentMethods = ArrayList<PaymentMethodResponseModel>()
         usersPaymentMethods.forEach { paymentMethods.add(PaymentMethodResponseModel(
             paymentMethodId = it.id,
-            alias = it.alias,
+            ccData = objectMapper.readValue(it.ccData, CreditCardDataModel::class.java),
+            payPalData = objectMapper.readValue(it.paypalData, PayPalDataModel::class.java),
+            sepaData = objectMapper.readValue(it.sepaData, SepaDataModel::class.java),
             type = it.type
         )) }
         return PaymentMethodListResponseModel(paymentMethods)

@@ -1,6 +1,9 @@
 package com.mobilabsolutions.payment.model.response
 
 import com.mobilabsolutions.payment.data.enum.PaymentMethodType
+import com.mobilabsolutions.payment.model.CreditCardDataModel
+import com.mobilabsolutions.payment.model.PayPalDataModel
+import com.mobilabsolutions.payment.model.SepaDataModel
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
@@ -12,9 +15,15 @@ data class PaymentMethodResponseModel(
     @ApiModelProperty(value = "Payment method ID", example = "jsnxcbjkmdmckd")
     val paymentMethodId: String?,
 
-    @ApiModelProperty(value = "Payment method alias - card number or email for PayPal", example = "VISA-1111")
-    val alias: String?,
-
     @ApiModelProperty(value = "Payment method type", example = "SEPA")
-    val type: PaymentMethodType?
+    val type: PaymentMethodType?,
+
+    @ApiModelProperty(value = "Credit card data")
+    val ccData: CreditCardDataModel?,
+
+    @ApiModelProperty(value = "PayPal data")
+    val payPalData: PayPalDataModel?,
+
+    @ApiModelProperty(value = "SEPA data")
+    val sepaData: SepaDataModel?
 )
