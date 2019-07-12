@@ -5,5 +5,6 @@ package com.mobilabsolutions.payment.data.enum
  */
 enum class TransactionStatus {
     SUCCESS,
-    FAIL
+    FAIL,
+    PENDING
 }
