@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.mobilabsolutions.payment.common.configuration.CommonConfiguration
 import com.mobilabsolutions.payment.common.util.RandomStringGenerator
 import com.mobilabsolutions.payment.data.domain.PaymentMethod
+import com.mobilabsolutions.payment.data.domain.Transaction
 import com.mobilabsolutions.payment.data.domain.User
 import com.mobilabsolutions.payment.data.enum.PaymentMethodType
 import com.mobilabsolutions.payment.data.enum.TransactionAction
 import com.mobilabsolutions.payment.data.enum.TransactionStatus
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
 import com.mobilabsolutions.payment.data.repository.TransactionRepository
+import com.mobilabsolutions.payment.model.MerchantNotificationsModel
+import com.mobilabsolutions.payment.model.request.MerchantNotificationsRequestModel
 import com.mobilabsolutions.payment.model.request.PaymentRequestModel
 import com.mobilabsolutions.payment.paymentsdk.service.PaymentSdkService
 import com.mobilabsolutions.payment.paymentsdk.model.PaymentDataModel
@@ -29,6 +32,7 @@ import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.quality.Strictness
+import java.time.Instant
 
 /**
  * @author <a href="mailto:jovana@mobilabsolutions.com">Jovana Veskovic</a>
@@ -51,6 +55,31 @@ class TransactionTest {
     private val currency = "EUR"
     private val reason = "Book"
     private val idempotentKey = "idempotentKey123"
+    private val paymentMethod = PaymentMethod(paymentMethodId, true, aliasId, ccData, paypalData, sepaData, PaymentMethodType.CC, user)
+    private val transaction = Transaction(
+        transactionId = transactionId,
+        currency = currency,
+        amount = amount,
+        reason = reason,
+        notification = true,
+        action = TransactionAction.AUTH,
+        status = TransactionStatus.PENDING,
+        id = "someid",
+        idempotentKey = null,
+        paymentMethod = paymentMethod
+    )
+    private val merchantNotificationsRequestModel = MerchantNotificationsRequestModel(
+        mutableListOf(MerchantNotificationsModel(
+            transactionId = transactionId,
+            transactionStatus = TransactionStatus.PENDING.name,
+            transactionAction = TransactionAction.AUTH.name,
+            paymentMethod = "CC",
+            amount = amount,
+            currency = currency,
+            reason = reason,
+            notificationCreatedDate = Instant.now().toString()
+        ))
+    )
 
     @InjectMocks
     private lateinit var transactionService: TransactionService
@@ -85,6 +114,7 @@ class TransactionTest {
         ).thenReturn(
             PaymentSdkAuthorizationResponseModel(paymentSdkTransactionId, amount, currency, TransactionStatus.SUCCESS, TransactionAction.AUTH, null)
         )
+        Mockito.`when`(transactionRepository.getTransactionsByTransactionIdAndAction(transactionId, TransactionAction.AUTH.name)).thenReturn(transaction)
     }
 
     @Test
@@ -97,5 +127,10 @@ class TransactionTest {
         Assertions.assertThrows(ApiException::class.java) {
             transactionService.authorize(idempotentKey, PaymentRequestModel(amount, currency, reason, wrongPaymentMethodId))
         }
+    }
+
+    @Test
+    fun `create notification transaction record`() {
+        transactionService.createNotificationTransactionRecord(merchantNotificationsRequestModel)
     }
 }

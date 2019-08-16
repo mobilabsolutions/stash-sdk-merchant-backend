@@ -6,8 +6,10 @@ import com.mobilabsolutions.payment.common.util.RandomStringGenerator
 import com.mobilabsolutions.payment.data.domain.PaymentMethod
 import com.mobilabsolutions.payment.data.domain.Transaction
 import com.mobilabsolutions.payment.data.enum.TransactionAction
+import com.mobilabsolutions.payment.data.enum.TransactionStatus
 import com.mobilabsolutions.payment.data.repository.PaymentMethodRepository
 import com.mobilabsolutions.payment.data.repository.TransactionRepository
+import com.mobilabsolutions.payment.model.request.MerchantNotificationsRequestModel
 import com.mobilabsolutions.payment.model.request.PaymentRequestModel
 import com.mobilabsolutions.payment.model.response.PaymentResponseModel
 import com.mobilabsolutions.payment.paymentsdk.service.PaymentSdkService
@@ -64,6 +66,32 @@ class TransactionService(
 
         return executeIdempotentTransaction(idempotentKeyHeader, TransactionAction.AUTH,
             paymentMethod, transactionId, request, authorizationResponse)
+    }
+
+    /**
+     * Creates transaction record for notifications received
+     *
+     * @param merchantNotificationListRequestModel: Merchant notifications request model
+     */
+    fun createNotificationTransactionRecord(merchantNotificationListRequestModel: MerchantNotificationsRequestModel) {
+        logger.info("Creating transaction record for received notifications")
+        merchantNotificationListRequestModel.notifications.forEach {
+            val transaction = transactionRepository.getTransactionsByTransactionIdAndAction(it.transactionId!!, it.transactionAction!!)
+            val newTransaction = Transaction(
+                transactionId = transaction!!.transactionId,
+                currency = it.currency,
+                amount = it.amount,
+                reason = it.reason,
+                status = TransactionStatus.valueOf(it.transactionStatus!!),
+                action = TransactionAction.valueOf(it.transactionAction),
+                paymentMethod = transaction.paymentMethod,
+                paymentSdkResponse = transaction.paymentSdkResponse,
+                notification = true,
+                id = randomStringGenerator.generateRandomAlphanumeric(TRANSACTION_ID_LENGTH),
+                idempotentKey = null
+            )
+            transactionRepository.save(newTransaction)
+        }
     }
 
     private fun executeIdempotentTransaction(
