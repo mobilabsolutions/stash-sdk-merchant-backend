@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
+/**
+ * @author <a href="mailto:mohamed.osman@mobilabsolutions.com">Mohamed Osman</a>
+ */
 @RestController
 @RequestMapping(NotificationController.BASE_URL)
 @Validated
