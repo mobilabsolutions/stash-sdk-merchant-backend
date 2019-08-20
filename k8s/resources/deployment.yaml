@@ -38,7 +38,7 @@ spec:
           name: api
         readinessProbe:
           httpGet:
-            path: "/merchant/actuator/health"
+            path: "/merchant/v1/actuator/health"
             port: api
           initialDelaySeconds: 60
           periodSeconds: 15
