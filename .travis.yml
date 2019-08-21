@@ -14,7 +14,7 @@ env:
 branches:
   only:
     - master
-    - /^(\d+\.)?(\d+\.)?\d+(-demo)?$/
+    - /^(\d+\.)?(\d+\.)?\d+(-\w+)?$/
 
 install: true
 
@@ -39,3 +39,4 @@ deploy:
     script: ${TRAVIS_BUILD_DIR}/k8s/gcp-demo-deploy.sh
     on:
       tags: true
+      branch: /^(\d+\.)?(\d+\.)?\d+(-demo)?$/

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.mobilabsolutions.payment</groupId>
 	<artifactId>payment-merchant</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 
 	<properties>
 		<kotlin.version>1.3.21</kotlin.version>
