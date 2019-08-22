@@ -114,7 +114,7 @@ class TransactionTest {
         ).thenReturn(
             PaymentSdkAuthorizationResponseModel(paymentSdkTransactionId, amount, currency, TransactionStatus.SUCCESS, TransactionAction.AUTH, null)
         )
-        Mockito.`when`(transactionRepository.getTransactionsByTransactionIdAndAction(transactionId, TransactionAction.AUTH.name)).thenReturn(transaction)
+        Mockito.`when`(transactionRepository.getTransactionBySdkTransactionIdAndAction(transactionId, TransactionAction.AUTH.name)).thenReturn(transaction)
     }
 
     @Test

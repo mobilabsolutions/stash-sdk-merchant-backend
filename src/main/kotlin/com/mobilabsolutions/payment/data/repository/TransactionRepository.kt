@@ -14,5 +14,5 @@ interface TransactionRepository : BaseRepository<Transaction, String> {
     fun getByIdempotentKeyAndActionAndPaymentMethod(@Param("idempotentKey") idempotentKey: String, @Param("action") action: TransactionAction, @Param("paymentMethod") paymentMethod: PaymentMethod): Transaction?
 
     @Query("SELECT * FROM transaction_record tr WHERE CAST(tr.payment_sdk_response AS json)#>>'{id}' = :transactionId AND tr.action = :action", nativeQuery = true)
-    fun getTransactionsByTransactionIdAndAction(@Param("transactionId") transactionId: String, @Param("action") action: String): Transaction?
+    fun getTransactionBySdkTransactionIdAndAction(@Param("transactionId") transactionId: String, @Param("action") action: String): Transaction?
 }

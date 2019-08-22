@@ -76,7 +76,7 @@ class TransactionService(
     fun createNotificationTransactionRecord(merchantNotificationListRequestModel: MerchantNotificationsRequestModel) {
         logger.info("Creating transaction record for received notifications")
         merchantNotificationListRequestModel.notifications.forEach {
-            val transaction = transactionRepository.getTransactionsByTransactionIdAndAction(it.transactionId!!, it.transactionAction!!)
+            val transaction = transactionRepository.getTransactionBySdkTransactionIdAndAction(it.transactionId!!, it.transactionAction!!)
             val newTransaction = Transaction(
                 transactionId = transaction!!.transactionId,
                 currency = it.currency,
