@@ -20,7 +20,7 @@ spec:
           secretName: cloudsql-instance-credentials
       containers:
       - name: payment-merchant-backend
-        image: eu.gcr.io/payment-server-reloaded/payment-merchant-backend:${KUBE_DEPLOYMENT_IMAGE_TAG}
+        image: docker.pkg.github.com/payment-sdk-merchant-backend/payment-merchant-backend:${KUBE_DEPLOYMENT_IMAGE_TAG}
         resources:
           requests:
             cpu: ${KUBE_DEPLOYMENT_CPU_REQUEST}

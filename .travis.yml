@@ -1,42 +1,15 @@
 services:
   - docker
-
 language: java
-
-dist: xenial
-
 jdk:
   - openjdk11
-
-env:
-  - CLUSTER_NAME=main REGION="europe-west3" PROJECT_ID="payment-server-reloaded" REGISTRY_HOSTNAME="eu.gcr.io" MVN_BUILD_JAVA_OPTS=""
-
 branches:
   only:
     - master
-    - /^(\d+\.)?(\d+\.)?\d+(-\w+)?$/
-
+    - "/^(\d+\.)?(\d+\.)?\d+(-\w+)?$/"
+cache:
+    directories:
+        - "$HOME/.m2"
 install: true
-
-before_script:
-  - cd ${HOME} && { curl -sL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-207.0.0-linux-x86_64.tar.gz | tar xz; ./google-cloud-sdk/install.sh --quiet; cd -; };
-  - source ${HOME}/google-cloud-sdk/path.bash.inc
-  - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
-
 script:
-  - ${TRAVIS_BUILD_DIR}/scripts/travis-build.sh
-
-deploy:
-  - provider: script
-    skip_cleanup: true
-    # deploy to kube dev namespace
-    script: ${TRAVIS_BUILD_DIR}/k8s/gcp-dev-deploy.sh
-    on:
-      branch: master
-  - provider: script
-    skip_cleanup: true
-      # deploy to kube demo namespace
-    script: ${TRAVIS_BUILD_DIR}/k8s/gcp-demo-deploy.sh
-    on:
-      tags: true
-      branch: /^(\d+\.)?(\d+\.)?\d+(-demo)?$/
+  - mvn -q clean package

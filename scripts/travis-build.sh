@@ -2,35 +2,32 @@
 set -euox pipefail
 IFS=$'\n\t'
 
-mvn ${MVN_BUILD_JAVA_OPTS} -q clean package
+mvn -q package
 
-KEY_FILE=payment-gcp-service-account.json
-echo "${KEY_FILE_CONTENT}" | base64 --decode > ${KEY_FILE}
+PROJECT_ID="mobilabsolutions/payment-sdk-merchant-backend"
+REGISTRY="docker.pkg.github.com"
 
-gcloud auth activate-service-account --key-file ${KEY_FILE}
-
-gcloud config set project ${PROJECT_ID}
-gcloud auth configure-docker --quiet
+docker login ${REGISTRY} -u ${DOCKER_USER} -p ${DOCKER_TOKEN}
 
 IMAGE_NAME="payment-merchant-backend"
-BASE_IMAGE=${REGISTRY_HOSTNAME}/${PROJECT_ID}/${IMAGE_NAME}
-INITIAL_IMAGE=${BASE_IMAGE}:commit-${TRAVIS_COMMIT}
+BASE_IMAGE_NAME=${REGISTRY}/${PROJECT_ID}/${IMAGE_NAME}
+INITIAL_IMAGE=${BASE_IMAGE_NAME}:commit-${TRAVIS_COMMIT}
 
 build() {
   echo "Building ${INITIAL_IMAGE}"
-  docker build -t ${INITIAL_IMAGE} ${TRAVIS_BUILD_DIR}
+  docker build -t ${INITIAL_IMAGE} ${TRAVIS_BUILD_DIR}/payment-ws
 }
 
 tag() {
   for TAG in "$@"; do
-    echo "Tagging ${BASE_IMAGE}:${TAG}"
-    docker tag ${INITIAL_IMAGE} ${BASE_IMAGE}:${TAG}
+    echo "Tagging ${BASE_IMAGE_NAME}:${TAG}"
+    docker tag ${INITIAL_IMAGE} ${BASE_IMAGE_NAME}:${TAG}
   done
 }
 
 push() {
-  echo "Pushing tags for ${BASE_IMAGE}"
-  docker push ${BASE_IMAGE}
+  echo "Pushing tags for ${BASE_IMAGE_NAME}"
+  docker push ${BASE_IMAGE_NAME}
 }
 
 build

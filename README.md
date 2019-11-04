@@ -1,3 +1,3 @@
 # Payment SDK Merchant Backend
 
-This repository contains code and documentation related to the merchant backend component of the Payment SDK system. 
+This repository contains a sample implementation of a merchant backend service, which uses the Stash! service.
